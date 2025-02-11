@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini API 调用示例</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        #responseBox {
+            border: 1px solid #ccc;
+            padding: 15px;
+            background-color: #f9f9f9;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Gemini API 问答</h2>
+        
+        <!-- 提问框 -->
+        <input type="text" id="questionInput" placeholder="请输入您的问题" />
+        
+        <!-- 提交按钮 -->
+        <button onclick="submitQuestion()">提交问题</button>
+        
+        <h3>提问：</h3>
+        <div id="questionBox"></div>
+
+        <h3>回答：</h3>
+        <div id="responseBox"></div>
+    </div>
+
+    <script>
+        async function submitQuestion() {
+            const question = document.getElementById("questionInput").value;
+            if (!question) {
+                alert("请输入问题！");
+                return;
+            }
+
+            // 显示提问框
+            document.getElementById("questionBox").textContent = question;
+            document.getElementById("responseBox").textContent = "正在获取答案...";
+
+            try {
+                // 发送 POST 请求到后端
+                const response = await fetch("https://hootao-backroom.deno.dev/", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ question: question })  // 发送用户问题
+                });
+
+                // 检查响应是否有效
+                if (!response.ok) {
+                    throw new Error('API 调用失败，状态码: ' + response.status);
+                }
+
+                const data = await response.json();
+
+                // 展示答案
+                if (data.answer) {
+                    document.getElementById("responseBox").textContent = data.answer;
+                } else {
+                    document.getElementById("responseBox").textContent = "没有得到有效的回答，请重试！";
+                }
+            } catch (error) {
+                console.error("API 调用失败:", error);
+                document.getElementById("responseBox").textContent = "调用失败，请稍后再试！";
+            }
+        }
+
+    </script>
+</body>
+</html>
