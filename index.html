@@ -66,25 +66,26 @@
                     body: JSON.stringify({ question: question })  // 发送用户问题
                 });
 
-                // 检查响应是否有效
+                // 处理响应
                 if (!response.ok) {
-                    throw new Error('API 调用失败，状态码: ' + response.status);
+                    // 如果响应不是200（成功），抛出错误
+                    throw new Error(`请求失败，状态码: ${response.status}`);
                 }
 
                 const data = await response.json();
-
-                // 展示答案
-                if (data.answer) {
+                
+                // 检查返回的数据是否包含答案
+                if (data && data.answer) {
                     document.getElementById("responseBox").textContent = data.answer;
                 } else {
                     document.getElementById("responseBox").textContent = "没有得到有效的回答，请重试！";
                 }
             } catch (error) {
+                // 捕获请求或解析错误
                 console.error("API 调用失败:", error);
-                document.getElementById("responseBox").textContent = "调用失败，请稍后再试！";
+                document.getElementById("responseBox").textContent = `调用失败：${error.message}`;
             }
         }
-
     </script>
 </body>
 </html>
